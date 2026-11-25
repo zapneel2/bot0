@@ -1,20 +1,12 @@
-name: Sync WSB to X Gist Queue
+name: Ping Jito Regions
 
 on:
-  schedule:
-    - cron: '*/30 * * * *' # Runs every 30 minutes
-  workflow_dispatch:       # Allows manual "Run workflow" button testing
+  workflow_dispatch:
 
 jobs:
-  sync:
+  ping:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - run: pip install requests
-      - env:
-          GIST_ID: ${{ secrets.GIST_ID }}
-          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: python3 -c 'import subprocess, platform, re; ips = [("Amsterdam", "74.118.140.240"), ("Dublin", "64.130.61.8"), ("Frankfurt", "64.130.50.14"), ("London", "64.130.46.153"), ("New York", "141.98.216.96"), ("Salt Lake City", "64.130.53.8"), ("Singapore", "202.8.11.224"), ("Tokyo", "202.8.9.160")]; flag = "-n" if platform.system().lower() == "windows" else "-c"; [print(f"{name:15} ({ip:15}): " + (m.group(1) + " ms" if (m := re.search(r"(?:min/avg/max(?:/mdev)?\s*=\s*[\d.]+/([\d.]+)|Average\s*=\s*(\d+)ms)", subprocess.run(["ping", flag, "5", ip], capture_output=True, text=True).stdout)) and (m := type("M", (), {"group": lambda s, i, g=m: g.group(1) or g.group(2)})()) else "timeout/blocked")) for name, ip in ips]'
+      - name: Ping Jito IPs
+        run: |
+          python3 -c 'import subprocess, re; ips = [("Amsterdam", "74.118.140.240"), ("Dublin", "64.130.61.8"), ("Frankfurt", "64.130.50.14"), ("London", "64.130.46.153"), ("New York", "141.98.216.96"), ("Salt Lake City", "64.130.53.8"), ("Singapore", "202.8.11.224"), ("Tokyo", "202.8.9.160")]; [print(f"{name:15} ({ip:15}): " + (m.group(1) + " ms" if (m := re.search(r"min/avg/max(?:/mdev)?\s*=\s*[\d.]+/([\d.]+)", subprocess.run(["ping", "-c", "5", ip], capture_output=True, text=True).stdout)) else "timeout/blocked")) for name, ip in ips]'

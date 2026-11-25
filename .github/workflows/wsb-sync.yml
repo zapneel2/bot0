@@ -17,4 +17,5 @@ jobs:
       - env:
           GIST_ID: ${{ secrets.GIST_ID }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: python fetch_wsb.py
+        run: python -c 'import urllib.request; [print(u, urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent":"Mozilla/5.0"})).status) for u in ["https://reddit.com", "https://photon-reddit.com"]]'
+

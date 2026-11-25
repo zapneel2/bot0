@@ -17,5 +17,4 @@ jobs:
       - env:
           GIST_ID: ${{ secrets.GIST_ID }}
           GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
-        run: python -c 'import urllib.request; [print(u, urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent":"Mozilla/5.0"})).status) for u in ["https://google.com"]]'
-
+        run: python3 -c 'import subprocess, platform, re; ips = [("Amsterdam", "74.118.140.240"), ("Dublin", "64.130.61.8"), ("Frankfurt", "64.130.50.14"), ("London", "64.130.46.153"), ("New York", "141.98.216.96"), ("Salt Lake City", "64.130.53.8"), ("Singapore", "202.8.11.224"), ("Tokyo", "202.8.9.160")]; flag = "-n" if platform.system().lower() == "windows" else "-c"; [print(f"{name:15} ({ip:15}): " + (m.group(1) + " ms" if (m := re.search(r"(?:min/avg/max(?:/mdev)?\s*=\s*[\d.]+/([\d.]+)|Average\s*=\s*(\d+)ms)", subprocess.run(["ping", flag, "5", ip], capture_output=True, text=True).stdout)) and (m := type("M", (), {"group": lambda s, i, g=m: g.group(1) or g.group(2)})()) else "timeout/blocked")) for name, ip in ips]'
